@@ -48,10 +48,6 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) — redirects to `/login`.
 
-## Design System
-
-Brand: **Serene Ledger** — calm fintech UI with Manrope + Hanken Grotesk typography.  
-See `docs/serene-ledger/DESIGN.md` for full color, spacing, and component specs.
 
 ## Branches
 
