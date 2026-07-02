@@ -1,0 +1,154 @@
+import type { Expense } from "@/features/expenses/types";
+import type { DashboardSummary } from "@/features/dashboard/types";
+import type { BudgetCategory, BudgetOverview } from "@/features/budget/types";
+
+const today = new Date().toISOString().split("T")[0];
+const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+
+export const mockExpenses: Expense[] = [
+  {
+    id: "exp_1",
+    merchant: "Whole Foods Market",
+    category: "groceries",
+    amount: 142.3,
+    currency: "USD",
+    date: today,
+    type: "debit",
+    timeAgo: "2h ago",
+    icon: "shopping_cart",
+    note: "Weekly Grocery Run",
+  },
+  {
+    id: "exp_2",
+    merchant: "Skyline Properties",
+    category: "housing",
+    amount: 2100,
+    currency: "USD",
+    date: yesterday,
+    type: "debit",
+    timeAgo: "Yesterday",
+    icon: "home",
+    note: "Monthly Rent Payment",
+  },
+  {
+    id: "exp_3",
+    merchant: "Uber Trip",
+    category: "transport",
+    amount: 24.5,
+    currency: "USD",
+    date: yesterday,
+    type: "debit",
+    timeAgo: "Yesterday",
+    icon: "directions_car",
+    note: "Late night ride home",
+  },
+  {
+    id: "exp_4",
+    merchant: "Clean Energy Co.",
+    category: "bills",
+    amount: 89.9,
+    currency: "USD",
+    date: yesterday,
+    type: "debit",
+    timeAgo: "Yesterday",
+    icon: "bolt",
+    note: "Utility Bill",
+  },
+  {
+    id: "exp_5",
+    merchant: "Remote Tech Inc.",
+    category: "income",
+    amount: 5200,
+    currency: "USD",
+    date: today,
+    type: "credit",
+    timeAgo: "Today",
+    icon: "work",
+    note: "Salary Deposit",
+  },
+];
+
+export const mockDashboardSummary: DashboardSummary = {
+  userName: "Alex",
+  greeting: "Good morning",
+  savingsDelta: 1240,
+  totalBalance: 42850.2,
+  monthSpending: 3120.45,
+  remainingBudget: 879.55,
+  currency: "USD",
+  currentMonth: new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date()),
+  savingsGoal: {
+    title: "Vacation in Italy",
+    current: 3250,
+    target: 5000,
+    percent: 65,
+  },
+  categories: [
+    { id: "housing", label: "Housing", percent: 75, color: "text-primary" },
+    { id: "food", label: "Food", percent: 45, color: "text-secondary" },
+    { id: "travel", label: "Travel", percent: 20, color: "text-tertiary" },
+    { id: "other", label: "Others", percent: 10, color: "text-outline" },
+  ],
+  recentExpenses: mockExpenses.slice(0, 4),
+};
+
+export const mockBudgetOverview: BudgetOverview = {
+  monthlyLimit: 4500,
+  totalSpent: 2840,
+  remaining: 1660,
+  percentUsed: 63,
+  isOverBudget: false,
+  daysLeft: 8,
+  dailyAverage: 91.61,
+};
+
+export const mockBudgetCategories: BudgetCategory[] = [
+  {
+    id: "dining",
+    label: "Dining & Drinks",
+    spent: 450,
+    limit: 600,
+    icon: "restaurant",
+    status: "close-to-cap",
+    statusLabel: "Close to cap",
+  },
+  {
+    id: "transport",
+    label: "Transport",
+    spent: 210,
+    limit: 800,
+    icon: "directions_car",
+    status: "healthy",
+    statusLabel: "Healthy",
+  },
+  {
+    id: "shopping",
+    label: "Shopping",
+    spent: 1200,
+    limit: 1000,
+    icon: "shopping_bag",
+    status: "over-limit",
+    statusLabel: "Over Limit",
+  },
+  {
+    id: "entertainment",
+    label: "Entertainment",
+    spent: 180,
+    limit: 400,
+    icon: "sports_esports",
+    status: "healthy",
+    statusLabel: "Healthy",
+  },
+  {
+    id: "health",
+    label: "Health & Fitness",
+    spent: 200,
+    limit: 300,
+    icon: "fitness_center",
+    status: "steady",
+    statusLabel: "Steady",
+  },
+];
