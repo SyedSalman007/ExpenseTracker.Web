@@ -1,6 +1,6 @@
 # ExpenseTracker.Web — Serene Ledger
 
-Next.js expense tracker based on the [Stitch](https://stitch.withgoogle.com/) **Serene Ledger** design export.
+Next.js expense tracker
 
 ## Screens (from Stitch export)
 
