@@ -36,8 +36,7 @@ src/
 ├── lib/
 ├── providers/
 └── styles/
-docs/
-└── serene-ledger/DESIGN.md  # Stitch design system tokens
+
 ```
 
 ## Getting Started
