@@ -37,7 +37,7 @@ export function SignupForm() {
         <header className="fixed left-0 top-0 z-40 flex h-16 w-full items-center px-container-margin">
           <span className="text-2xl font-extrabold text-primary">{APP_NAME}</span>
         </header>
-        <main className="mx-auto mb-xl mt-24 w-full max-w-md px-md">
+        <main className="mx-auto mb-xl mt-24 w-full max-w-96 px-md">
           <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg shadow-sm">
             <div className="mb-xl">
               <h1 className="mb-xs text-3xl font-bold text-on-surface">
