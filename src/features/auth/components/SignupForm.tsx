@@ -31,7 +31,184 @@ export function SignupForm() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col md:flex-row">
+    <>
+      {/* Mobile layout */}
+      <div className="min-h-screen bg-surface-bright md:hidden">
+        <header className="fixed left-0 top-0 z-40 flex h-16 w-full items-center px-container-margin">
+          <span className="text-2xl font-extrabold text-primary">{APP_NAME}</span>
+        </header>
+        <main className="mx-auto mb-xl mt-24 w-full max-w-md px-md">
+          <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-lg shadow-sm">
+            <div className="mb-xl">
+              <h1 className="mb-xs text-3xl font-bold text-on-surface">
+                Create Account
+              </h1>
+              <p className="text-sm text-on-surface-variant">
+                Start your journey to financial wellness today.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-md">
+              <div className="flex flex-col gap-xs">
+                <label
+                  htmlFor="name-mobile"
+                  className="px-1 text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+                >
+                  Full Name
+                </label>
+                <div className="relative">
+                  <Icon name="person" className="absolute left-3 top-1/2 -translate-y-1/2 !text-xl text-outline" />
+                  <input
+                    id="name-mobile"
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full rounded-xl border-none bg-surface-container py-3 pl-10 pr-4 text-sm outline-none transition-all focus:ring-2 focus:ring-primary-container"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-xs">
+                <label
+                  htmlFor="email-mobile"
+                  className="px-1 text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Icon name="mail" className="absolute left-3 top-1/2 -translate-y-1/2 !text-xl text-outline" />
+                  <input
+                    id="email-mobile"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full rounded-xl border-none bg-surface-container py-3 pl-10 pr-4 text-sm outline-none transition-all focus:ring-2 focus:ring-primary-container"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-xs">
+                <label
+                  htmlFor="password-mobile"
+                  className="px-1 text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <Icon name="lock" className="absolute left-3 top-1/2 -translate-y-1/2 !text-xl text-outline" />
+                  <input
+                    id="password-mobile"
+                    type="password"
+                    placeholder="Create a strong password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full rounded-xl border-none bg-surface-container py-3 pl-10 pr-12 text-sm outline-none transition-all focus:ring-2 focus:ring-primary-container"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-xs">
+                <label
+                  htmlFor="confirmPassword-mobile"
+                  className="px-1 text-xs font-semibold uppercase tracking-wider text-on-surface-variant"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Icon name="lock_reset" className="absolute left-3 top-1/2 -translate-y-1/2 !text-xl text-outline" />
+                  <input
+                    id="confirmPassword-mobile"
+                    type="password"
+                    placeholder="Repeat your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full rounded-xl border-none bg-surface-container py-3 pl-10 pr-4 text-sm outline-none transition-all focus:ring-2 focus:ring-primary-container"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="mt-xs flex items-start gap-sm">
+                <input
+                  id="terms-mobile"
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-outline-variant text-primary-container focus:ring-primary-container"
+                  required
+                />
+                <label htmlFor="terms-mobile" className="text-xs leading-relaxed text-on-surface-variant">
+                  I agree to the{" "}
+                  <Link href="#" className="font-semibold text-primary-container hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="#" className="font-semibold text-primary-container hover:underline">
+                    Privacy Policy
+                  </Link>
+                  .
+                </label>
+              </div>
+
+              <div className="mt-md flex flex-col gap-sm">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full rounded-xl bg-primary-container py-4 text-lg font-semibold text-on-primary shadow-sm transition-transform active:scale-95 disabled:opacity-60"
+                >
+                  {isLoading ? "Creating account..." : "Create Account"}
+                </button>
+
+                <div className="flex items-center py-xs">
+                  <div className="flex-grow border-t border-outline-variant" />
+                  <span className="mx-4 flex-shrink text-xs font-semibold uppercase tracking-wider text-outline">
+                    Or continue with
+                  </span>
+                  <div className="flex-grow border-t border-outline-variant" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-sm">
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-sm rounded-xl border border-outline-variant bg-surface-container-low py-3 text-sm font-semibold transition-colors hover:bg-surface-container active:scale-95"
+                  >
+                    Google
+                  </button>
+                  <button
+                    type="button"
+                    className="flex items-center justify-center gap-sm rounded-xl border border-outline-variant bg-surface-container-low py-3 text-sm font-semibold transition-colors hover:bg-surface-container active:scale-95"
+                  >
+                    Apple
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <div className="mt-xl text-center">
+              <p className="text-sm text-on-surface-variant">
+                Already have an account?{" "}
+                <Link href={ROUTES.LOGIN} className="font-bold text-primary-container hover:underline">
+                  Log In
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <footer className="mt-lg px-md text-center">
+            <p className="text-xs font-semibold uppercase tracking-wider text-outline">
+              Secure 256-bit SSL encryption
+            </p>
+          </footer>
+        </main>
+      </div>
+
+      {/* Desktop layout */}
+      <main className="hidden min-h-screen md:flex md:flex-row">
       <section className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-primary-container p-xl md:flex">
         <div className="pointer-events-none absolute inset-0 h-full w-full opacity-20">
           <svg
@@ -128,19 +305,6 @@ export function SignupForm() {
 
       <section className="flex w-full items-center justify-center bg-surface p-md md:w-1/2 md:p-xl">
         <div className="w-full max-w-112">
-          <div className="mb-lg flex items-center gap-sm md:hidden">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-container">
-              <Icon
-                name="account_balance_wallet"
-                className="text-sm text-white"
-                filled
-              />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-primary">
-              {APP_NAME}
-            </span>
-          </div>
-
           <div className="mb-xl">
             <h2 className="mb-xs text-3xl font-bold text-on-surface">
               Create Account
@@ -351,6 +515,7 @@ export function SignupForm() {
           </p>
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

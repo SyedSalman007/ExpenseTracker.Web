@@ -18,4 +18,21 @@ export const expenseApi = {
       icon: "payments",
     };
   },
+
+  async updateExpense(id: string, payload: CreateExpensePayload): Promise<Expense> {
+    return {
+      id,
+      merchant: payload.merchant,
+      category: payload.category,
+      amount: payload.amount,
+      currency: payload.currency ?? "USD",
+      date: payload.date ?? new Date().toISOString().split("T")[0],
+      type: payload.type ?? "debit",
+      icon: "payments",
+    };
+  },
+
+  async deleteExpense(_id: string): Promise<void> {
+    return;
+  },
 };

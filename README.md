@@ -1,4 +1,4 @@
-# ExpenseTracker.Web — Serene Ledger
+# ExpenseTracker.Web
 
 Next.js expense tracker
 
