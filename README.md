@@ -2,7 +2,7 @@
 
 Next.js expense tracker
 
-## Screens (from Stitch export)
+## Screens
 
 | Route | Stitch screen |
 |-------|----------------|
