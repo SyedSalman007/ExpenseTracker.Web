@@ -4,7 +4,7 @@ Next.js expense tracker
 
 ## Screens
 
-| Route | Stitch screen |
+| Route | Screen |
 |-------|----------------|
 | `/login` | login / login_desktop |
 | `/sign-up` | sign_up / sign_up_desktop |
