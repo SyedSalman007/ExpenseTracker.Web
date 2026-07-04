@@ -10,7 +10,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <div className="absolute bottom-[-10%] left-[-10%] h-[30%] w-[30%] rounded-full bg-secondary-fixed/10 blur-[100px]" />
       </div>
 
-      <header className="flex w-full items-center justify-between px-lg py-md">
+      <header className="hidden w-full items-center justify-between px-lg py-md md:flex">
         <Link href={ROUTES.LOGIN} className="flex items-center gap-xs">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
             <Icon name="account_balance_wallet" className="text-white" filled />
@@ -23,7 +23,23 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <footer className="flex w-full flex-col items-center justify-between gap-md border-t border-outline-variant/30 px-lg py-md md:flex-row">
+      {/* Mobile footer */}
+      <footer className="mt-auto w-full px-container-margin py-lg text-center md:hidden">
+        <nav className="flex justify-center gap-lg text-xs font-semibold uppercase tracking-wider text-outline">
+          <Link href="#" className="hover:text-on-surface-variant">
+            Privacy Policy
+          </Link>
+          <Link href="#" className="hover:text-on-surface-variant">
+            Terms of Service
+          </Link>
+          <Link href="#" className="hover:text-on-surface-variant">
+            Help Center
+          </Link>
+        </nav>
+      </footer>
+
+      {/* Desktop footer */}
+      <footer className="hidden w-full flex-col items-center justify-between gap-md border-t border-outline-variant/30 px-lg py-md md:flex md:flex-row">
         <p className="text-sm text-on-surface-variant opacity-70">
           © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </p>

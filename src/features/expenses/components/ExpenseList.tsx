@@ -6,6 +6,12 @@ import { formatCurrency } from "@/features/expenses/utils/formatCurrency";
 import { getCategoryBadgeClasses } from "@/features/categories/utils/getCategoryMeta";
 import { formatDate } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
+import { Button } from "@/components/ui/Button";
+import { IconButton } from "@/components/ui/IconButton";
+import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { expenseApi } from "@/features/expenses/services/expenseApi";
+import { ExpenseFormDialog } from "@/features/expenses/components/ExpenseFormDialog";
 
 interface ExpenseListProps {
   expenses: Expense[];
@@ -13,34 +19,178 @@ interface ExpenseListProps {
 
 const FILTER_CHIPS = ["All", "Food", "Rent", "Utilities", "Travel"] as const;
 
-export function ExpenseList({ expenses }: ExpenseListProps) {
+export function ExpenseList({ expenses: initialExpenses }: ExpenseListProps) {
+  const [expenses, setExpenses] = useState(initialExpenses);
   const [activeFilter, setActiveFilter] = useState<(typeof FILTER_CHIPS)[number]>("All");
+  const [formExpense, setFormExpense] = useState<Expense | undefined>(undefined);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
 
   const totalSpending = expenses
     .filter((expense) => expense.category !== "income")
     .reduce((sum, expense) => sum + expense.amount, 0);
 
+  function openAddForm() {
+    setFormExpense(undefined);
+    setIsFormOpen(true);
+  }
+
+  function openEditForm(expense: Expense) {
+    setFormExpense(expense);
+    setIsFormOpen(true);
+  }
+
+  async function handleFormSubmit(payload: Parameters<typeof expenseApi.createExpense>[0]) {
+    if (formExpense) {
+      const updated = await expenseApi.updateExpense(formExpense.id, payload);
+      setExpenses((current) => current.map((expense) => (expense.id === updated.id ? updated : expense)));
+    } else {
+      const created = await expenseApi.createExpense(payload);
+      setExpenses((current) => [created, ...current]);
+    }
+    setIsFormOpen(false);
+  }
+
+  async function handleConfirmDelete() {
+    if (!expenseToDelete) return;
+    await expenseApi.deleteExpense(expenseToDelete.id);
+    setExpenses((current) => current.filter((expense) => expense.id !== expenseToDelete.id));
+    setExpenseToDelete(null);
+  }
+
+  const columns: DataTableColumn<Expense>[] = [
+    {
+      key: "date",
+      header: "Date",
+      render: (expense) => (
+        <span className="whitespace-nowrap text-sm text-on-surface-variant">{formatDate(expense.date)}</span>
+      ),
+    },
+    {
+      key: "description",
+      header: "Description",
+      render: (expense) => (
+        <div className="flex items-center gap-md">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-primary">
+            <Icon name={expense.icon ?? "payments"} />
+          </div>
+          <div>
+            <p className="text-sm font-bold text-on-surface">{expense.merchant}</p>
+            {expense.note ? <p className="text-xs text-outline">{expense.note}</p> : null}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "category",
+      header: "Category",
+      render: (expense) => (
+        <span
+          className={`rounded-full px-sm py-1 text-[10px] font-semibold uppercase ${getCategoryBadgeClasses(
+            expense.category,
+          )}`}
+        >
+          {expense.category === "groceries" || expense.category === "dining" ? "Food & Drink" : expense.category}
+        </span>
+      ),
+    },
+    {
+      key: "amount",
+      header: "Amount",
+      align: "right",
+      render: (expense) => {
+        const isIncome = expense.category === "income";
+        return (
+          <span className={`font-bold ${isIncome ? "text-secondary" : "text-on-surface"}`}>
+            {isIncome ? "+" : "-"}
+            {formatCurrency(expense.amount, expense.currency)}
+          </span>
+        );
+      },
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      render: (expense) => (
+        <div className="flex justify-end gap-xs opacity-0 transition-opacity group-hover:opacity-100">
+          <IconButton aria-label="Edit expense" onClick={() => openEditForm(expense)}>
+            <Icon name="edit_note" />
+          </IconButton>
+          <IconButton variant="danger" aria-label="Delete expense" onClick={() => setExpenseToDelete(expense)}>
+            <Icon name="delete" />
+          </IconButton>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="space-y-xl">
-      {/* Header */}
-      <div className="flex items-end justify-between">
+      {/* Header (desktop only — mobile shows the title in the TopBar) */}
+      <div className="hidden items-end justify-between md:flex">
         <div>
           <h1 className="text-display-lg font-bold text-primary">Expenses</h1>
           <p className="text-base text-on-surface-variant">
             Review and manage your daily expenditures.
           </p>
         </div>
-        <button
-          type="button"
-          className="card-shadow flex items-center gap-xs rounded-xl bg-primary px-lg py-sm font-bold text-white transition-all hover:bg-primary-container active:scale-95"
-        >
+        <Button variant="primary" onClick={openAddForm}>
           <Icon name="add" />
           <span>New Expense</span>
-        </button>
+        </Button>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
+      {/* Summary Cards — mobile (3-up bento incl. quick action) */}
+      <div className="grid grid-cols-1 gap-card-gap md:hidden">
+        <div className="flex h-32 flex-col justify-between rounded-xl border border-outline-variant bg-surface-container-lowest p-md shadow-card">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              Total Monthly
+            </span>
+            <Icon name="trending_up" className="text-primary" />
+          </div>
+          <div>
+            <p className="text-xl font-bold">{formatCurrency(totalSpending)}</p>
+            <p className="text-sm text-secondary">+12% from last month</p>
+          </div>
+        </div>
+
+        <div className="flex h-32 flex-col justify-between rounded-xl border border-outline-variant bg-surface-container-lowest p-md shadow-card">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
+              Budget Remaining
+            </span>
+            <Icon name="account_balance" className="text-tertiary" />
+          </div>
+          <div>
+            <p className="text-xl font-bold">{formatCurrency(1279.5)}</p>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
+              <div className="h-full w-3/4 rounded-full bg-primary" />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex h-32 flex-col justify-between rounded-xl bg-primary-container p-md text-on-primary-container shadow-card">
+          <div className="flex items-start justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider opacity-80">
+              Quick Action
+            </span>
+            <Icon name="bolt" />
+          </div>
+          <button
+            type="button"
+            onClick={openAddForm}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-surface-container-lowest py-2 font-bold text-primary transition-all hover:bg-surface-bright active:scale-95"
+          >
+            <Icon name="add" className="!text-lg" />
+            New Expense
+          </button>
+        </div>
+      </div>
+
+      {/* Summary Cards — desktop */}
+      <div className="hidden gap-lg md:grid md:grid-cols-2">
         <div className="card-shadow relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-lg">
           <div className="mb-sm flex items-start justify-between">
             <div>
@@ -109,17 +259,25 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
                 {chip}
               </button>
             ))}
-            <div className="mx-xs h-6 w-px bg-outline-variant" />
+            <div className="mx-xs hidden h-6 w-px bg-outline-variant md:block" />
             <button
               type="button"
-              className="flex items-center gap-xs rounded-lg border border-outline-variant px-md py-1.5 text-on-surface-variant transition-all hover:bg-surface-container"
+              className="hidden items-center gap-xs rounded-lg border border-outline-variant px-md py-1.5 text-on-surface-variant transition-all hover:bg-surface-container md:flex"
             >
               <Icon name="filter_list" className="!text-lg" />
               <span className="text-sm">More Filters</span>
             </button>
           </div>
           <div className="flex items-center gap-sm">
-            <div className="relative">
+            <div className="flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2 md:hidden">
+              <Icon name="calendar_today" className="!text-lg text-on-surface-variant" />
+              <select className="border-none bg-transparent p-0 text-sm text-on-surface focus:ring-0">
+                <option>October 2023</option>
+                <option>September 2023</option>
+                <option>August 2023</option>
+              </select>
+            </div>
+            <div className="relative hidden md:block">
               <select className="appearance-none rounded-lg border-none bg-surface-container py-2 pl-4 pr-10 text-sm text-on-surface focus:ring-2 focus:ring-primary-container">
                 <option>October 2023</option>
                 <option>September 2023</option>
@@ -132,7 +290,7 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
             </div>
             <button
               type="button"
-              className="rounded-lg border border-outline-variant p-2 text-on-surface-variant transition-all hover:bg-surface-container"
+              className="hidden rounded-lg border border-outline-variant p-2 text-on-surface-variant transition-all hover:bg-surface-container md:block"
               aria-label="Download"
             >
               <Icon name="download" />
@@ -140,92 +298,18 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr className="border-b border-outline-variant bg-surface-container-low/50">
-                <th className="px-lg py-md text-xs font-semibold uppercase tracking-wider text-outline">
-                  Date
-                </th>
-                <th className="px-lg py-md text-xs font-semibold uppercase tracking-wider text-outline">
-                  Description
-                </th>
-                <th className="px-lg py-md text-xs font-semibold uppercase tracking-wider text-outline">
-                  Category
-                </th>
-                <th className="px-lg py-md text-right text-xs font-semibold uppercase tracking-wider text-outline">
-                  Amount
-                </th>
-                <th className="w-16 px-lg py-md" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/30">
-              {expenses.map((expense) => {
-                const isIncome = expense.category === "income";
-                return (
-                  <tr
-                    key={expense.id}
-                    className="group transition-colors hover:bg-surface-container-low"
-                  >
-                    <td className="whitespace-nowrap px-lg py-md text-sm text-on-surface-variant">
-                      {formatDate(expense.date)}
-                    </td>
-                    <td className="px-lg py-md">
-                      <div className="flex items-center gap-md">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-primary">
-                          <Icon name={expense.icon ?? "payments"} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-on-surface">
-                            {expense.merchant}
-                          </p>
-                          {expense.note ? (
-                            <p className="text-xs text-outline">{expense.note}</p>
-                          ) : null}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-lg py-md">
-                      <span
-                        className={`rounded-full px-sm py-1 text-[10px] font-semibold uppercase ${getCategoryBadgeClasses(
-                          expense.category,
-                        )}`}
-                      >
-                        {expense.category === "groceries" || expense.category === "dining"
-                          ? "Food & Drink"
-                          : expense.category}
-                      </span>
-                    </td>
-                    <td
-                      className={`px-lg py-md text-right text-sm font-bold ${
-                        isIncome ? "text-secondary" : "text-on-surface"
-                      }`}
-                    >
-                      {isIncome ? "+" : "-"}
-                      {formatCurrency(expense.amount, expense.currency)}
-                    </td>
-                    <td className="px-lg py-md text-right">
-                      <button
-                        type="button"
-                        aria-label="More options"
-                        className="text-outline opacity-0 transition-colors group-hover:opacity-100 hover:text-primary"
-                      >
-                        <Icon name="more_vert" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          data={expenses}
+          getRowKey={(expense) => expense.id}
+          emptyMessage="No transactions yet. Add your first expense to get started."
+        />
 
         {/* Pagination */}
         <div className="flex items-center justify-between border-t border-outline-variant p-lg">
           <p className="text-sm text-on-surface-variant">
             Showing <span className="font-bold">1-{expenses.length}</span> of{" "}
-            <span className="font-bold">42</span> transactions
+            <span className="font-bold">{expenses.length}</span> transactions
           </p>
           <div className="flex gap-xs">
             <button
@@ -244,20 +328,8 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
             </button>
             <button
               type="button"
-              className="rounded-lg border border-outline-variant px-4 py-2 text-on-surface-variant hover:bg-surface-container"
-            >
-              2
-            </button>
-            <button
-              type="button"
-              className="rounded-lg border border-outline-variant px-4 py-2 text-on-surface-variant hover:bg-surface-container"
-            >
-              3
-            </button>
-            <button
-              type="button"
               aria-label="Next page"
-              className="rounded-lg border border-outline-variant p-2 text-on-surface-variant hover:bg-surface-container"
+              className="rounded-lg border border-outline-variant px-4 py-2 text-on-surface-variant hover:bg-surface-container"
             >
               <Icon name="chevron_right" />
             </button>
@@ -265,8 +337,8 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
         </div>
       </div>
 
-      {/* Bottom Cards */}
-      <div className="grid grid-cols-1 gap-lg md:grid-cols-3">
+      {/* Bottom Cards (desktop only) */}
+      <div className="hidden gap-lg md:grid md:grid-cols-3">
         <div className="relative flex items-center gap-lg overflow-hidden rounded-xl bg-primary p-lg text-white md:col-span-2">
           <div className="relative z-10 flex-1">
             <h4 className="mb-xs text-xl font-semibold">Budgeting Tip of the Month</h4>
@@ -302,6 +374,22 @@ export function ExpenseList({ expenses }: ExpenseListProps) {
           </div>
         </div>
       </div>
+
+      <ExpenseFormDialog
+        open={isFormOpen}
+        expense={formExpense}
+        onClose={() => setIsFormOpen(false)}
+        onSubmit={handleFormSubmit}
+      />
+      <ConfirmDialog
+        open={Boolean(expenseToDelete)}
+        title="Delete Expense"
+        description={
+          expenseToDelete ? `Are you sure you want to delete "${expenseToDelete.merchant}"? This can't be undone.` : undefined
+        }
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setExpenseToDelete(null)}
+      />
     </div>
   );
 }

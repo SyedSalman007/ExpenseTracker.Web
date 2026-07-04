@@ -67,32 +67,22 @@ export function SettingsView() {
 
   return (
     <div className="space-y-xl">
-      <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
+      <div className="hidden lg:block">
+        <h1 className="text-2xl font-bold text-primary">Settings</h1>
         <p className="text-sm text-on-surface-variant">
           Manage your account and app preferences
         </p>
       </div>
 
       {/* Profile card */}
-      <div className="card-shadow flex flex-col items-start gap-md rounded-xl border border-outline-variant bg-surface-container-lowest p-xl sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-md">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary-container text-xl font-bold text-on-primary-container">
-            {displayName
-              .split(" ")
-              .map((part) => part[0])
-              .join("")
-              .slice(0, 2)
-              .toUpperCase()}
-          </div>
-          <div>
-            <p className="text-xl font-bold">{displayName}</p>
-            <p className="text-sm text-on-surface-variant">{displayEmail}</p>
-          </div>
+      <div className="card-shadow flex flex-col items-start gap-md rounded-xl border border-outline-variant bg-surface-container-lowest p-lg sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col">
+          <span className="text-xl font-bold text-on-surface">{displayName}</span>
+          <span className="text-sm text-on-surface-variant">{displayEmail}</span>
         </div>
         <button
           type="button"
-          className="rounded-lg bg-primary px-md py-sm text-sm font-semibold text-on-primary transition-all hover:brightness-110 active:scale-[0.98]"
+          className="rounded-lg bg-primary-container px-md py-sm text-sm font-semibold text-on-primary-container transition-all hover:brightness-110 active:scale-[0.98]"
         >
           Edit Profile
         </button>
@@ -163,7 +153,7 @@ export function SettingsView() {
           </button>
           <button
             type="button"
-            className="w-full py-sm text-center text-sm text-error underline decoration-error/40 underline-offset-4 transition-colors hover:decoration-error"
+            className="w-full py-sm text-center text-sm text-on-surface-variant underline decoration-outline-variant underline-offset-4 transition-colors hover:text-on-surface"
           >
             Delete Account
           </button>
