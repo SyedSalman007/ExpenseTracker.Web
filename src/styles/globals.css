@@ -44,6 +44,14 @@
   body {
     @apply bg-background text-on-surface font-body antialiased;
   }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
 
 .card-shadow {
