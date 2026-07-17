@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { createLoginErrorToast, createLoginSuccessToast } from "@/features/auth/utils/authToasts";
 import { ROUTES } from "@/lib/constants";
 import { Icon } from "@/components/ui/Icon";
 import { FadeImage } from "@/components/ui/FadeImage";
+import { showCustomToast } from "@/components/ui/CustomToast";
 
 const AVATAR_URLS = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDxyZcjijiu_JFbPoEhlvjSjprtwmJbBRfB6S1jsLWwbWY4FWgYI_mEbVhiB1Oobfb6symPZjtUIfbQKqU0bgLVUc1Rl-eC63c_MxL20zY_cWRz4WOAObF_5lwOnX8LZmAPKoHU14q2Cce5g14SpCdWNI2xmPvjL9q8f31a7wgjrOAdKAr3Vce0MLis1hC5kg4Pl0iPY-cZgFLLarN_qCv_6zzVo6Fr8hYG87p0Vef-AoZybLnW_8qHrR2t6G4xbVfp6gemgXz8iFc",
@@ -23,8 +25,13 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login({ email, password });
-    router.push(ROUTES.DASHBOARD);
+    try {
+      await login({ email, password });
+      showCustomToast(createLoginSuccessToast());
+      router.push(ROUTES.DASHBOARD);
+    } catch (err) {
+      showCustomToast(createLoginErrorToast(err instanceof Error ? err.message : undefined));
+    }
   };
 
   return (
@@ -299,16 +306,16 @@ export function LoginForm() {
               >
                 {isLoading ? "Signing in..." : "Sign In"}
               </button>
-
-              <div className="relative flex items-center py-md">
+              {/* future work for google/apple login */}
+              {/* <div className="relative flex items-center py-md">
                 <div className="flex-grow border-t border-outline-variant" />
                 <span className="mx-md flex-shrink text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
                   Or continue with
                 </span>
                 <div className="flex-grow border-t border-outline-variant" />
-              </div>
+              </div> */}
 
-              <div className="grid grid-cols-2 gap-sm">
+              {/* <div className="grid grid-cols-2 gap-sm">
                 <button
                   type="button"
                   className="flex items-center justify-center gap-xs rounded-lg border border-outline-variant bg-white py-sm text-sm text-on-surface transition-colors hover:bg-surface active:scale-[0.98]"
@@ -345,7 +352,7 @@ export function LoginForm() {
                   </svg>
                   Apple
                 </button>
-              </div>
+              </div> */}
             </form>
 
             <footer className="mt-xl text-center">

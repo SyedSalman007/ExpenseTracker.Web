@@ -4,9 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { createSignupErrorToast, createSignupSuccessToast } from "@/features/auth/utils/authToasts";
 import { APP_NAME, ROUTES } from "@/lib/constants";
 import { Icon } from "@/components/ui/Icon";
 import { FadeImage } from "@/components/ui/FadeImage";
+import { showCustomToast } from "@/components/ui/CustomToast";
 
 const AVATAR_URLS = [
   "https://lh3.googleusercontent.com/aida-public/AB6AXuA_nQPLj7pLf4ffKnATGly552VdEuD7DK5iGpxjXJ-sScWM3MjWMVoQmBElkcXJD0z1Lngd_gScaKOlNfzJQj0Ew-KCBk_fek98jNuLndriZM5bsrjTYmg8n17pkkdtQgUOhI5gwlf-MalE_qND8XtENu857tbs8K1u_QEkh1V9ZrUDeF2L6dkpd1yF6nvoQMt-betwJmA1tSJoAvEKwmh0KJdAy2QImp3Mp_lbfGpfZQpGbA_0JN_mYMWnTaDB9cS2OXCwuhAw1Tg",
@@ -25,9 +27,17 @@ export function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword) return;
-    await signup({ name, email, password });
-    router.push(ROUTES.DASHBOARD);
+    if (password !== confirmPassword) {
+      showCustomToast(createSignupErrorToast("Passwords do not match"));
+      return;
+    }
+    try {
+      await signup({ name, email, password });
+      showCustomToast(createSignupSuccessToast());
+      router.push(ROUTES.DASHBOARD);
+    } catch (err) {
+      showCustomToast(createSignupErrorToast(err instanceof Error ? err.message : undefined));
+    }
   };
 
   return (

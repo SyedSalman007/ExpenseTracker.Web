@@ -3,12 +3,14 @@
 import {
   createContext,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 import { authService } from "@/features/auth/services/authService";
 import type { AuthCredentials, SignupData, User } from "@/features/auth/types";
+import { getCookie } from "@/lib/cookie";
 
 interface AuthContextValue {
   user: User | null;
@@ -24,13 +26,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const cookie = getCookie("user");
+    if (cookie) setUser(JSON.parse(cookie));
+  }, []);
+
   const login = useCallback(async (credentials: AuthCredentials) => {
     setIsLoading(true);
     try {
       const response = await authService.login(credentials);
       setUser(response.user);
-      localStorage.setItem("token", response.token);
-      document.cookie = `session=${response.token}; path=/`;
     } finally {
       setIsLoading(false);
     }
@@ -41,8 +46,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await authService.signup(data);
       setUser(response.user);
-      localStorage.setItem("token", response.token);
-      document.cookie = `session=${response.token}; path=/`;
     } finally {
       setIsLoading(false);
     }
@@ -51,8 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     await authService.logout();
     setUser(null);
-    localStorage.removeItem("token");
-    document.cookie = "session=; path=/; max-age=0";
   }, []);
 
   const value = useMemo(
