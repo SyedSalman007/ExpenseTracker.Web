@@ -2,7 +2,6 @@
 
 import { useContext } from "react";
 import { AuthContext } from "@/providers/AuthProvider";
-import type { AuthCredentials, SignupData } from "@/features/auth/types";
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -13,5 +12,3 @@ export function useAuth() {
 
   return context;
 }
-
-export type { AuthCredentials, SignupData };
