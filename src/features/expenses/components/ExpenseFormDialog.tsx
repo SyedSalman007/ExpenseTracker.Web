@@ -24,7 +24,7 @@ interface ExpenseFormDialogProps {
   open: boolean;
   expense?: Expense;
   onClose: () => void;
-  onSubmit: (payload: CreateExpensePayload) => void;
+  onSubmit: (payload: CreateExpensePayload) => Promise<void>;
 }
 
 export function ExpenseFormDialog({ open, expense, onClose, onSubmit }: ExpenseFormDialogProps) {
@@ -34,16 +34,22 @@ export function ExpenseFormDialog({ open, expense, onClose, onSubmit }: ExpenseF
   const [amount, setAmount] = useState(expense?.amount?.toString() ?? "");
   const [date, setDate] = useState(expense?.date ?? new Date().toISOString().split("T")[0]);
   const [note, setNote] = useState(expense?.note ?? "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    onSubmit({
-      merchant,
-      category,
-      amount: Number(amount),
-      date,
-      note: note || undefined,
-    });
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        merchant,
+        category,
+        amount: Number(amount),
+        date,
+        note: note || undefined,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -93,10 +99,10 @@ export function ExpenseFormDialog({ open, expense, onClose, onSubmit }: ExpenseF
           onChange={(event) => setNote(event.target.value)}
         />
         <div className="flex justify-end gap-sm pt-sm">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" isLoading={isSubmitting}>
             {isEditing ? "Save Changes" : "Add Expense"}
           </Button>
         </div>

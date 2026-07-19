@@ -6,6 +6,7 @@ import { formatCurrency } from "@/features/expenses/utils/formatCurrency";
 import { getCategoryBadgeClasses } from "@/features/categories/utils/getCategoryMeta";
 import { formatDate } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { DataTable, type DataTableColumn } from "@/components/ui/DataTable";
@@ -141,37 +142,60 @@ export function ExpenseList({ expenses: initialExpenses }: ExpenseListProps) {
         </Button>
       </div>
 
-      {/* Summary Cards — mobile (3-up bento incl. quick action) */}
-      <div className="grid grid-cols-1 gap-card-gap md:hidden">
-        <div className="flex h-32 flex-col justify-between rounded-xl border border-outline-variant bg-surface-container-lowest p-md shadow-card">
-          <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-              Total Monthly
-            </span>
-            <Icon name="trending_up" className="text-primary" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{formatCurrency(totalSpending)}</p>
-            <p className="text-sm text-secondary">+12% from last month</p>
-          </div>
-        </div>
-
-        <div className="flex h-32 flex-col justify-between rounded-xl border border-outline-variant bg-surface-container-lowest p-md shadow-card">
-          <div className="flex items-start justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-              Budget Remaining
-            </span>
-            <Icon name="account_balance" className="text-tertiary" />
-          </div>
-          <div>
-            <p className="text-xl font-bold">{formatCurrency(1279.5)}</p>
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
-              <div className="h-full w-3/4 rounded-full bg-primary" />
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 gap-card-gap md:grid-cols-2 md:gap-lg">
+        <div className="card-shadow relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-md md:p-lg">
+          <div className="mb-sm flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant md:text-outline">
+                Total Monthly Spending
+              </p>
+              <p className="mt-xs text-xl font-bold text-primary md:text-display-lg">
+                {formatCurrency(totalSpending)}
+              </p>
+            </div>
+            <div className="rounded-lg p-sm text-primary md:bg-primary-container/10">
+              <Icon name="trending_up" />
             </div>
           </div>
+          <div className="flex items-center gap-xs text-sm font-bold text-secondary">
+            <Icon name="arrow_downward" className="hidden !text-sm md:inline" />
+            <span>12% from last month</span>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 hidden h-1 overflow-hidden bg-primary-container/20 md:block">
+            <div className="h-full w-2/3 rounded-r-full bg-primary" />
+          </div>
         </div>
 
-        <div className="flex h-32 flex-col justify-between rounded-xl bg-primary-container p-md text-on-primary-container shadow-card">
+        <div className="card-shadow rounded-xl border border-outline-variant bg-surface-container-lowest p-md md:p-lg">
+          <div className="mb-sm flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant md:text-outline">
+                Budget Remaining
+              </p>
+              <p className="mt-xs text-xl font-bold text-secondary md:text-display-lg">
+                {formatCurrency(1279.5)}
+              </p>
+            </div>
+            <div className="rounded-lg p-sm text-tertiary md:bg-secondary-container/20 md:text-secondary">
+              <Icon name="account_balance" />
+            </div>
+          </div>
+          <div className="mt-sm space-y-xs md:mt-md">
+            <div className="flex justify-between text-sm">
+              <span className="text-on-surface-variant">72% of budget used</span>
+              <span className="hidden text-on-surface md:inline">Budget: $4,700</span>
+            </div>
+            <ProgressBar
+              percent={72}
+              trackClassName="h-2 bg-surface-container-high md:bg-surface-container"
+              fillClassName="bg-secondary"
+            />
+          </div>
+        </div>
+
+        {/* Quick action — mobile only (desktop uses the header button instead) */}
+        <div className="flex h-32 flex-col justify-between rounded-xl bg-primary-container p-md text-on-primary-container shadow-card md:hidden">
           <div className="flex items-start justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider opacity-80">
               Quick Action
@@ -186,57 +210,6 @@ export function ExpenseList({ expenses: initialExpenses }: ExpenseListProps) {
             <Icon name="add" className="!text-lg" />
             New Expense
           </button>
-        </div>
-      </div>
-
-      {/* Summary Cards — desktop */}
-      <div className="hidden gap-lg md:grid md:grid-cols-2">
-        <div className="card-shadow relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest p-lg">
-          <div className="mb-sm flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-outline">
-                Total Monthly Spending
-              </p>
-              <h3 className="mt-xs text-display-lg font-bold text-primary">
-                {formatCurrency(totalSpending)}
-              </h3>
-            </div>
-            <div className="rounded-lg bg-primary-container/10 p-sm text-primary">
-              <Icon name="trending_up" />
-            </div>
-          </div>
-          <div className="flex items-center gap-xs font-bold text-secondary">
-            <Icon name="arrow_downward" className="!text-sm" />
-            <span className="text-sm">12% from last month</span>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden bg-primary-container/20">
-            <div className="h-full w-2/3 rounded-r-full bg-primary" />
-          </div>
-        </div>
-
-        <div className="card-shadow rounded-xl border border-outline-variant bg-surface-container-lowest p-lg">
-          <div className="mb-sm flex items-start justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-outline">
-                Budget Remaining
-              </p>
-              <h3 className="mt-xs text-display-lg font-bold text-secondary">
-                {formatCurrency(1279.5)}
-              </h3>
-            </div>
-            <div className="rounded-lg bg-secondary-container/20 p-sm text-secondary">
-              <Icon name="account_balance" />
-            </div>
-          </div>
-          <div className="mt-md space-y-xs">
-            <div className="flex justify-between text-sm">
-              <span className="text-on-surface-variant">72% of budget used</span>
-              <span className="text-on-surface">Budget: $4,700</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container">
-              <div className="h-full w-[72%] rounded-full bg-secondary" />
-            </div>
-          </div>
         </div>
       </div>
 
@@ -269,24 +242,13 @@ export function ExpenseList({ expenses: initialExpenses }: ExpenseListProps) {
             </button>
           </div>
           <div className="flex items-center gap-sm">
-            <div className="flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2 md:hidden">
+            <div className="flex items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 py-2 md:rounded-lg md:border-none md:bg-surface-container">
               <Icon name="calendar_today" className="!text-lg text-on-surface-variant" />
               <select className="border-none bg-transparent p-0 text-sm text-on-surface focus:ring-0">
                 <option>October 2023</option>
                 <option>September 2023</option>
                 <option>August 2023</option>
               </select>
-            </div>
-            <div className="relative hidden md:block">
-              <select className="appearance-none rounded-lg border-none bg-surface-container py-2 pl-4 pr-10 text-sm text-on-surface focus:ring-2 focus:ring-primary-container">
-                <option>October 2023</option>
-                <option>September 2023</option>
-                <option>August 2023</option>
-              </select>
-              <Icon
-                name="expand_more"
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-outline"
-              />
             </div>
             <button
               type="button"
