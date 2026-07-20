@@ -57,6 +57,8 @@ import {
   MdWarning,
   MdEventRepeat,
   MdCommute,
+  MdCheckCircle,
+  MdCancel,
 } from "react-icons/md";
 
 const iconMap: Record<string, IconType> = {
@@ -117,6 +119,8 @@ const iconMap: Record<string, IconType> = {
   warning: MdWarning,
   event_repeat: MdEventRepeat,
   commute: MdCommute,
+  check_circle: MdCheckCircle,
+  cancel: MdCancel,
 };
 
 export function Icon({

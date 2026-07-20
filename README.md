@@ -19,34 +19,47 @@ Next.js expense tracker
 ```
 src/
 ├── app/
-│   ├── (auth)/              # Login & sign-up
-│   ├── (app)/               # Protected app shell (sidebar + top bar)
-│   └── api/                 # Reserved for future real API routes (currently empty)
+│   ├── (auth)/          # Login & sign-up
+│   ├── (app)/           # Protected app shell (sidebar + top bar)
+│   └── api/auth/        # login/register/logout routes — proxy to the .NET backend
 ├── features/
-│   ├── auth/
+│   ├── auth/            # authService (client) + authApi.server (backend calls)
 │   ├── dashboard/
 │   ├── expenses/
 │   ├── budget/
 │   ├── reports/
 │   ├── settings/
-│   └── categories/          # Shared category utilities
+│   └── categories/      # Shared category utilities
 ├── components/
-│   ├── layout/              # AppShell, Sidebar, TopBar, AuthShell
+│   ├── layout/          # AppShell, Sidebar, TopBar, AuthShell
 │   └── ui/
-├── lib/
-├── providers/
+├── lib/                 # cookie.ts, jwt.ts, constants.ts, utils.ts
+├── providers/            # AuthProvider (client-side auth state)
+├── middleware.ts         # Redirects based on auth state (see below)
 └── styles/
 
 ```
 
+Only auth (login/signup) is wired to the real backend — dashboard/expenses/budget/reports still run on mock data in `src/lib/mock-data.ts` until those APIs exist.
+
 ## Getting Started
+
+Requires the backend at [`ExpenseTracker.DotNet`](../ExpenseTracker.DotNet) running locally (`dotnet run --launch-profile http` from `ExpenseTracker.API`, default `http://localhost:5255`).
+
+Set the backend URL in `.env.local` (gitignored):
+
+```
+EXPENSE_API_BASE_URL=http://localhost:5255
+```
+
+Then:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) — redirects to `/login`.
+Open [http://localhost:3000](http://localhost:3000). `middleware.ts` redirects unauthenticated visitors to `/login` and signed-in visitors away from `/login`/`/sign-up` to `/dashboard`, based on the `token` cookie set at login/register.
 
 
 ## Branches

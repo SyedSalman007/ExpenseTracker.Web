@@ -58,7 +58,7 @@ export function Sidebar() {
           <Icon name="person" />
         </div>
         <div>
-          <p className="font-bold text-on-surface">{user?.name ?? "Alex Thorne"}</p>
+          <p className="font-bold text-on-surface">{user?.name}</p>
           <p className="text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">
             Premium Plan
           </p>

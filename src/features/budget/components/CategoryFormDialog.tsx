@@ -22,7 +22,7 @@ interface CategoryFormDialogProps {
   open: boolean;
   category?: BudgetCategory;
   onClose: () => void;
-  onSubmit: (payload: CategoryPayload) => void;
+  onSubmit: (payload: CategoryPayload) => Promise<void>;
 }
 
 export function CategoryFormDialog({ open, category, onClose, onSubmit }: CategoryFormDialogProps) {
@@ -31,15 +31,21 @@ export function CategoryFormDialog({ open, category, onClose, onSubmit }: Catego
   const [limit, setLimit] = useState(category?.limit?.toString() ?? "");
   const [spent, setSpent] = useState(category?.spent?.toString() ?? "0");
   const [icon, setIcon] = useState(category?.icon ?? ICON_OPTIONS[0].value);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    onSubmit({
-      label,
-      limit: Number(limit),
-      spent: Number(spent),
-      icon,
-    });
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        label,
+        limit: Number(limit),
+        spent: Number(spent),
+        icon,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -85,10 +91,10 @@ export function CategoryFormDialog({ open, category, onClose, onSubmit }: Catego
           required
         />
         <div className="flex justify-end gap-sm pt-sm">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" isLoading={isSubmitting}>
             {isEditing ? "Save Changes" : "Create Sub-Budget"}
           </Button>
         </div>
